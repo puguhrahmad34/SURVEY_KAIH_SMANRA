@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survei 7 Kebiasaan Anak Indonesia Hebat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#4F46E5',
+                            sky: '#0284C7',
+                            emerald: '#10B981',
+                            amber: '#F59E0B',
+                            rose: '#F43F5E',
+                            purple: '#8B5CF6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .bg-gradient-hero {
+            background: linear-gradient(135deg, #4F46E5 0%, #0284C7 50%, #10B981 100%);
+        }
+        .custom-radio:checked + label {
+            border-color: #4F46E5;
+            background-color: #EEF2FF;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+        }
+        .custom-checkbox:checked + label {
+            border-color: #10B981;
+            background-color: #ECFDF5;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-sky-400 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-flag"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-base md:text-lg leading-tight">Anak Indonesia Hebat</h1>
+                    <p class="text-xs text-slate-500">Survei 7 Kebiasaan Harian</p>
+                </div>
+            </div>
+            <div id="userInfoHeader" class="hidden flex items-center space-x-2 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-full text-xs font-semibold text-indigo-700">
+                <i class="fa-solid fa-user-circle text-sm"></i>
+                <span id="userNameDisplay">Nama Siswa</span>
+                <span id="userGenderBadge" class="bg-indigo-200 text-indigo-800 text-[10px] px-2 py-0.5 rounded-full font-bold">L</span>
+                <button onclick="logout()" title="Keluar" class="ml-1 text-slate-400 hover:text-rose-600 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- ================= SECTION 1: LOGIN (SISWA / WALI KELAS) ================= -->
+        <section id="loginSection" class="w-full">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-10 text-center max-w-lg mx-auto my-8 relative overflow-hidden">
+                <!-- Background Accent -->
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-100 rounded-full blur-2xl opacity-60"></div>
+                <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-sky-100 rounded-full blur-2xl opacity-60"></div>
+
+                <!-- Tab Switcher (Siswa vs Wali Kelas) -->
+                <div class="flex p-1 bg-slate-100 rounded-2xl mb-6 max-w-xs mx-auto text-xs font-semibold">
+                    <button type="button" id="tabSiswaBtn" onclick="switchLoginTab('siswa')" class="flex-1 py-2 rounded-xl bg-white text-indigo-600 shadow-sm transition">
+                        <i class="fa-solid fa-user-graduate mr-1"></i> Siswa
+                    </button>
+                    <button type="button" id="tabWaliBtn" onclick="switchLoginTab('wali')" class="flex-1 py-2 rounded-xl text-slate-500 hover:text-indigo-600 transition">
+                        <i class="fa-solid fa-user-tie mr-1"></i> Wali Kelas
+                    </button>
+                </div>
+
+                <div id="loginAvatar" class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                    <i id="loginIcon" class="fa-solid fa-id-card"></i>
+                </div>
+                
+                <h2 id="loginTitle" class="text-2xl font-bold text-slate-800 mb-1">Login Siswa</h2>
+                <p id="loginDesc" class="text-sm text-slate-500 mb-6">Masukkan Nomor Induk Siswa Nasional (NISN) Anda.</p>
+
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                    <div>
+                        <label id="inputLabel" for="nisnInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">NISN Siswa</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i id="inputIcon" class="fa-solid fa-hashtag"></i>
+                            </span>
+                            <input type="text" id="nisnInput" required placeholder="Contoh: 0123456789"
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition text-sm font-medium">
+                        </div>
+                        <p id="demoHint" class="text-xs text-slate-400 mt-1">NISN Demo Siswa: <b>0123456789</b></p>
+                        <p id="studentDataStatus" class="text-xs mt-2 font-semibold text-amber-600">Memuat data siswa dari Google Sheet...</p>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div id="loginError" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-base"></i>
+                        <span id="errorMessageText">NISN tidak ditemukan dalam database siswa!</span>
+                    </div>
+
+                    <button type="submit" id="btnSubmitLogin"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 text-sm">
+                        <span id="btnSubmitText">Verifikasi & Lanjutkan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <!-- Information box -->
+                <div class="mt-8 pt-6 border-t border-slate-100 text-left">
+                    <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <i class="fa-solid fa-database text-sky-600 mt-0.5"></i>
+                        <div class="text-xs text-slate-500">
+                            <p class="font-semibold text-slate-700">Terintegrasi Data Drive/Sheet</p>
+                            <p id="infoBoxText">Sistem mencocokkan NISN siswa secara real-time dengan Data Master Siswa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION WALI KELAS DASHBOARD ================= -->
+        <section id="waliSection" class="hidden space-y-6">
+            <!-- Header Wali Kelas -->
+            <div class="bg-gradient-to-r from-slate-800 to-indigo-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="bg-white/10 text-indigo-200 text-xs px-3 py-1 rounded-full font-medium tracking-wide uppercase">Portal Pemantauan Guru</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold mt-2">Dashboard Wali Kelas</h2>
+                    <p class="text-slate-300 text-sm mt-1">Pantau siswa yang sudah dan belum mengisi Survei 7 Kebiasaan Anak Indonesia Hebat.</p>
+                </div>
+                <button onclick="refreshWaliData()" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+                </button>
+            </div>
+
+            <!-- Ringkasan Statistik -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase">Total Siswa</span>
+                        <i class="fa-solid fa-users text-indigo-500"></i>
+                    </div>
+                    <div id="statTotal" class="text-2xl md:text-3xl font-bold text-slate-800">0</div>
+                    <span class="text-[10px] text-slate-400">Terdaftar di Master Data</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase">Sudah Mengisi</span>
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    </div>
+                    <div id="statSudah" class="text-2xl md:text-3xl font-bold text-emerald-600">0</div>
+                    <span id="statSudahPct" class="text-[10px] text-emerald-600 font-semibold">0% Partisipasi</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase">Belum Mengisi</span>
+                        <i class="fa-solid fa-clock text-amber-500"></i>
+                    </div>
+                    <div id="statBelum" class="text-2xl md:text-3xl font-bold text-amber-600">0</div>
+                    <span id="statBelumPct" class="text-[10px] text-amber-600 font-semibold">0% Belum Respon</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase">Rata-rata Poin</span>
+                        <i class="fa-solid fa-chart-line text-sky-500"></i>
+                    </div>
+                    <div id="statAvgScore" class="text-2xl md:text-3xl font-bold text-sky-600">0</div>
+                    <span class="text-[10px] text-slate-400">Dari total maks 105</span>
+                </div>
+            </div>
+
+            <!-- Filter & Search Controls -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 justify-between items-center">
+                <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                    <select id="filterKelas" onchange="renderWaliDashboard()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ALL">Semua Kelas</option>
+                        <option value="X">Tingkat X</option>
+                        <option value="XI">Tingkat XI</option>
+                        <option value="XII">Tingkat XII</option>
+                    </select>
+                    <select id="filterStatus" onchange="renderWaliTable()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ALL">Semua Status</option>
+                        <option value="BELUM" selected>Belum Mengisi</option>
+                        <option value="SUDAH">Sudah Mengisi</option>
+                    </select>
+                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                        Dari
+                        <input type="date" id="filterTanggalMulai" onchange="renderWaliDashboard()" aria-label="Tanggal mulai pantauan"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                        Sampai
+                        <input type="date" id="filterTanggalAkhir" onchange="renderWaliDashboard()" aria-label="Tanggal akhir pantauan"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </label>
+                    <button type="button" onclick="clearWaliDateFilter()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">
+                        Semua tanggal
+                    </button>
+                </div>
+                <div class="relative w-full md:w-64">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="searchSiswa" onkeyup="renderWaliTable()" placeholder="Cari Nama atau NISN..."
+                        class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <p id="filterTanggalError" class="hidden w-full text-xs font-semibold text-rose-600" role="alert"></p>
+            </div>
+
+            <!-- Tabel Pemantauan Siswa -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i> Daftar Status Presensi Survei Siswa
+                    </h3>
+                    <button onclick="copyReminderText()" class="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-copy"></i> Salin Pengumuman WA
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3">No</th>
+                                <th class="p-3">NISN</th>
+                                <th class="p-3">Nama Siswa</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3 text-center">JK</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center">Tanggal / Skor</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waliTableBody" class="divide-y divide-slate-100">
+                            <!-- JS Will Render Rows Here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: FORM SURVEI 7 KEBIASAAN ================= -->
+        <section id="surveySection" class="hidden space-y-6">
+            <!-- Banner / Header Info -->
+            <div class="bg-gradient-hero rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium tracking-wide uppercase">Evaluasi Karakter</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold mt-2">7 Kebiasaan Anak Indonesia Hebat</h2>
+                    <p class="text-white/90 text-sm mt-1 max-w-xl">Isi formulir survei kebiasaan harianmu secara jujur. Kumpulkan poin dan lihat seberapa hebat karaktermu hari ini!</p>
+                </div>
+            </div>
+
+            <!-- Form Start -->
+            <form id="surveyForm" onsubmit="calculateResults(event)" class="space-y-6">
+
+                <!-- Tanggal Survei Input -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-calendar-days text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Tanggal Survei</h3>
+                            <p class="text-xs text-slate-500">Pilih tanggal pelaksanaan pengisian survei</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <input type="date" id="surveyDate" required
+                            class="w-full md:w-56 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-700 text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- 1. Bangun Lebih Awal -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg">1</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Bangun Lebih Awal</h3>
+                            <p class="text-xs text-slate-500">Jam berapa kamu bangun di pagi hari?</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <input type="radio" id="b_1" name="bangun" value="15" class="hidden custom-radio" required>
+                            <label for="b_1" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">Sebelum 05.00 WIB</span>
+                                    <span class="text-xs text-slate-400">Bangun sangat pagi</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-indigo-500 opacity-0 custom-radio-icon"></i>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="b_2" name="bangun" value="12" class="hidden custom-radio">
+                            <label for="b_2" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">05.00 - 06.00 WIB</span>
+                                    <span class="text-xs text-slate-400">Bangun tepat waktu</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-indigo-500 opacity-0 custom-radio-icon"></i>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="b_3" name="bangun" value="8" class="hidden custom-radio">
+                            <label for="b_3" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">Setelah 06.00 WIB</span>
+                                    <span class="text-xs text-slate-400">Bangun agak siang</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-indigo-500 opacity-0 custom-radio-icon"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Taat Beribadah -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">2</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Taat Beribadah</h3>
+                            <p class="text-xs text-slate-500">Bagaimana ketertiban ibadahmu sesuai agama/kepercayaan?</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                            <input type="radio" id="ib_1" name="ibadah" value="15" class="hidden custom-radio" required>
+                            <label for="ib_1" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Tertib</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="ib_2" name="ibadah" value="8" class="hidden custom-radio">
+                            <label for="ib_2" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Kurang Tertib</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="ib_3" name="ibadah" value="5" class="hidden custom-radio">
+                            <label for="ib_3" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Tidak Tertib</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="ib_4" name="ibadah" value="0" class="hidden custom-radio">
+                            <label for="ib_4" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Tidak Pernah</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Berolahraga -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-lg">3</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Berolahraga</h3>
+                            <p class="text-xs text-slate-500">Berapa intensitas kamu berolahraga?</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <input type="radio" id="ol_1" name="olahraga" value="15" class="hidden custom-radio" required>
+                            <label for="ol_1" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Rutin (Minimal 3x Seminggu)</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="ol_2" name="olahraga" value="8" class="hidden custom-radio">
+                            <label for="ol_2" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Tidak Rutin</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="ol_3" name="olahraga" value="0" class="hidden custom-radio">
+                            <label for="ol_3" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Tidak Pernah</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Makan Sehat (Checkbox Type) -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-lg">4</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Makan Sehat</h3>
+                            <p class="text-xs text-slate-500">Pilih pola makan sehat yang kamu jalankan (Bisa pilih lebih dari satu):</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <div>
+                            <input type="checkbox" id="m_1" value="2" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_1" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Sarapan Pagi</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="m_2" value="2" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_2" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Makan Siang</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="m_3" value="2" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_3" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Makan Malam</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="m_4" value="3" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_4" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Protein (Telur/Tempe/Susu/dll)</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="m_5" value="3" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_5" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Buah dan Sayur</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="m_6" value="3" class="hidden custom-checkbox makan-cb" onchange="updateMakanScore()">
+                            <label for="m_6" class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Air Putih Cukup (8 Gelas)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Gemar Belajar -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">5</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Gemar Belajar</h3>
+                            <p class="text-xs text-slate-500">Berapa lama durasi belajar mandiri di rumah hari ini?</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                            <input type="radio" id="bl_1" name="belajar" value="15" class="hidden custom-radio" required>
+                            <label for="bl_1" class="flex flex-col justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Lebih dari 60 Menit</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="bl_2" name="belajar" value="12" class="hidden custom-radio">
+                            <label for="bl_2" class="flex flex-col justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">30 - 60 Menit</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="bl_3" name="belajar" value="9" class="hidden custom-radio">
+                            <label for="bl_3" class="flex flex-col justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Kurang dari 30 Menit</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="bl_4" name="belajar" value="2" class="hidden custom-radio">
+                            <label for="bl_4" class="flex flex-col justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm h-full">
+                                <span class="font-medium text-slate-700">Tidak Belajar Mandiri</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Bermasyarakat -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">6</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Bermasyarakat</h3>
+                            <p class="text-xs text-slate-500">Membantu orang tua, membantu teman, atau kegiatan sosial di lingkungan</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <input type="radio" id="soc_1" name="sosial" value="15" class="hidden custom-radio" required>
+                            <label for="soc_1" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Rutin Melakukan</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="soc_2" name="sosial" value="8" class="hidden custom-radio">
+                            <label for="soc_2" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Kadang-kadang</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="soc_3" name="sosial" value="2" class="hidden custom-radio">
+                            <label for="soc_3" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <span class="font-medium text-slate-700">Tidak Pernah</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Tidur Cepat -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg">7</div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Tidur Cepat</h3>
+                            <p class="text-xs text-slate-500">Jam berapa kamu tidur di malam hari?</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <input type="radio" id="td_1" name="tidur" value="15" class="hidden custom-radio" required>
+                            <label for="td_1" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">Sebelum 21.00 WIB</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="td_2" name="tidur" value="8" class="hidden custom-radio">
+                            <label for="td_2" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">21.00 - 24.00 WIB</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="td_3" name="tidur" value="2" class="hidden custom-radio">
+                            <label for="td_3" class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition text-sm">
+                                <div>
+                                    <span class="font-medium text-slate-700 block">Di atas 24.00 WIB</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button id="submitSurveyButton" type="submit" 
+                        class="w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-bold py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 text-base flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span id="submitSurveyButtonText">Kirim & Lihat Hasil Rekapitulasi</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ================= SECTION 3: HASIL SURVEI ================= -->
+        <section id="resultSection" class="hidden space-y-6">
+            <div id="surveySubmitStatus" role="status" aria-live="polite" class="hidden rounded-xl border p-4 text-left text-sm font-semibold"></div>
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 text-center">
+                
+                <div class="w-20 h-20 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Hasil Evaluasi Poin</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-2" id="resultStudentName">Nama Siswa</h2>
+                <p class="text-xs text-slate-500 mt-0.5" id="resultStudentDetail">NISN: - | Kelas: - | JK: -</p>
+                <p class="text-xs font-semibold text-indigo-600 mt-1" id="resultSurveyDate">Tanggal Survei: -</p>
+
+                <!-- Big Score Card -->
+                <div class="my-6 p-6 bg-slate-50 rounded-2xl border border-slate-200 inline-block w-full max-w-sm">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Skor Kebiasaan</p>
+                    <div class="text-5xl font-black text-indigo-600 my-2">
+                        <span id="totalScore">0</span> <span class="text-xl font-medium text-slate-400">/ 105</span>
+                    </div>
+                    <div id="badgeCategory" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold text-white bg-indigo-600 mt-1">
+                        -
+                    </div>
+                </div>
+
+                <!-- Advice / Appreciation -->
+                <div id="adviceBox" class="p-4 rounded-xl bg-indigo-50 border border-indigo-100 text-left text-sm text-indigo-900 max-w-2xl mx-auto mb-6">
+                    <p class="font-bold flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-star text-amber-500"></i> Catatan Motivasi:
+                    </p>
+                    <p id="adviceText" class="text-xs md:text-sm text-slate-600">Terus pertahankan kebiasaan baikmu untuk menjadi generasi hebat Indonesia!</p>
+                </div>
+
+                <!-- Detail Breakdown Table -->
+                <div class="text-left max-w-2xl mx-auto border border-slate-200 rounded-xl overflow-hidden mb-6">
+                    <div class="bg-slate-100 px-4 py-2.5 font-bold text-xs text-slate-700 uppercase tracking-wider flex justify-between">
+                        <span>Kebiasaan Harian</span>
+                        <span>Poin Diperoleh</span>
+                    </div>
+                    <ul class="divide-y divide-slate-100 text-xs md:text-sm">
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">1. Bangun Lebih Awal</span>
+                            <span class="font-bold text-slate-800" id="score_bangun">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">2. Taat Beribadah</span>
+                            <span class="font-bold text-slate-800" id="score_ibadah">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">3. Berolahraga</span>
+                            <span class="font-bold text-slate-800" id="score_olahraga">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">4. Makan Sehat</span>
+                            <span class="font-bold text-slate-800" id="score_makan">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">5. Gemar Belajar</span>
+                            <span class="font-bold text-slate-800" id="score_belajar">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">6. Bermasyarakat</span>
+                            <span class="font-bold text-slate-800" id="score_sosial">0 Poin</span>
+                        </li>
+                        <li class="px-4 py-3 flex justify-between items-center">
+                            <span class="text-slate-600">7. Tidur Cepat</span>
+                            <span class="font-bold text-slate-800" id="score_tidur">0 Poin</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="resetForm()" 
+                        class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Isi Survei Lagi
+                    </button>
+                    <button onclick="window.print()" 
+                        class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-print"></i> Cetak Hasil
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-4 text-center text-xs text-slate-400">
+        <div class="max-w-4xl mx-auto px-4">
+            <p>© 2026 Aplikasi Survei 7 Kebiasaan Anak Indonesia Hebat. Siap diintegrasikan ke Google Sites.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Mode Login: 'siswa' atau 'wali'
+        let currentLoginMode = 'siswa';
+
+        const SHEETS = {
+            X: "1E-oG-F6wRWmSFELnknvU_6wrkRfwhmnnQ8TCOhov1sg",
+            XI: "1dtQlyFoUAGCPnlCY35owSU_08Mi7lV-7XRtXaiXKc7I",
+            XII: "1jDG7OjWFt-eBLhhdlbRIrTCDgrw5Cn_HpU9Tj18JuKg",
+            REKAP: "1Ho_WzEV3CASYK0sZ9TnmDjwBCU5s_ys8sOfNihqteM8"
+        };
+
+        // Apps Script gabungan menangani pemuatan data dan penyimpanan respons.
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAxMVyVb-kMSX7XDk5e6jCyPAqHya2YWYMH1gh-qSyJ2JeMT7LbKtmezrXkKh6_W0/exec";
+        const CLASS_APPS_SCRIPT_URLS = {
+            X: "https://script.google.com/macros/s/AKfycbw8Ua17oSHIaWEWqS0d3LmvOuPTkmNI9jdjJq9HsDvILcC14s-pElajB6URIIX43wdQug/exec",
+            XI: "https://script.google.com/macros/s/AKfycbxpMDacpqMwngutESMcOYACamGJQZnpZJlL-1kZRCQ82nwGsxRFTCC7YazoKfuwzv7uww/exec",
+            XII: "https://script.google.com/macros/s/AKfycbzgTOKHpaFJ_TLrUvTcuVHG94Z3H2Xlyr5AYfYO3JJWenV0gRpWHaPN-CfyoIbD4DHh/exec"
+        };
+
+        // Data siswa dimuat langsung dari Sheet Kelas X/XI/XII.
+        const DEMO_STUDENT = { nisn: "0123456789", nama: "Siswa Demo", kelas: "X DEMO", jk: "L" };
+        let studentDatabase = [DEMO_STUDENT];
+        let surveySubmissions = [];
+        let studentDataLoading = true;
+        let surveySubmissionInProgress = false;
+
+        function normalizeNISN(value) {
+            const digits = String(value || '').replace(/\D/g, '');
+            return digits ? digits.padStart(10, '0') : '';
+        }
+
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], value = '', quoted = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"') {
+                    if (quoted && text[i + 1] === '"') { value += '"'; i++; }
+                    else quoted = !quoted;
+                } else if (char === ',' && !quoted) {
+                    row.push(value.trim()); value = '';
+                } else if ((char === '\n' || char === '\r') && !quoted) {
+                    if (char === '\r' && text[i + 1] === '\n') i++;
+                    row.push(value.trim());
+                    if (row.some(cell => cell !== '')) rows.push(row);
+                    row = []; value = '';
+                } else {
+                    value += char;
+                }
+            }
+            if (value !== '' || row.length) { row.push(value.trim()); if (row.some(cell => cell !== '')) rows.push(row); }
+            return rows;
+        }
+
+        function updateStudentDataStatus(text, tone = 'amber') {
+            const status = document.getElementById('studentDataStatus');
+            if (!status) return;
+            status.className = `text-xs mt-2 font-semibold ${tone === 'green' ? 'text-emerald-600' : tone === 'red' ? 'text-rose-600' : 'text-amber-600'}`;
+            status.textContent = text;
+        }
+
+        function sheetCSVUrl(id, sheetName) {
+            const base = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&cb=${Date.now()}`;
+            return sheetName ? `${base}&sheet=${encodeURIComponent(sheetName)}` : base;
+        }
+
+        async function fetchCSV(id, sheetName) {
+            const response = await fetch(sheetCSVUrl(id, sheetName));
+            if (!response.ok) throw new Error(`Gagal memuat Sheet (${response.status})`);
+            return parseCSV(await response.text());
+        }
+
+        async function loadAppsScriptData() {
+            if (!APPS_SCRIPT_URL) return false;
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&cb=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (!data.ok || !Array.isArray(data.students)) throw new Error(data.error || 'Respons Apps Script tidak valid');
+                studentDatabase = data.students.length > 0 ? data.students : [DEMO_STUDENT];
+                if (!studentDatabase.some(student => student.nisn === DEMO_STUDENT.nisn)) {
+                    studentDatabase.push(DEMO_STUDENT);
+                }
+                surveySubmissions = Array.isArray(data.submissions)
+                    ? data.submissions.map(submission => ({ ...submission, nisn: normalizeNISN(submission.nisn) }))
+                    : [];
+                studentDataLoading = false;
+                updateStudentDataStatus(`Sinkron aktif: ${studentDatabase.length - (studentDatabase.some(s => s.nisn === DEMO_STUDENT.nisn && s.nama === 'Siswa Demo') ? 1 : 0)} siswa dari Sheet dan Apps Script.`, 'green');
+                localStorage.setItem('kaihSurveySubmissions', JSON.stringify(surveySubmissions));
+                if (currentUser?.role === 'wali') renderWaliDashboard();
+                return true;
+            } catch (error) {
+                console.error('Gagal sinkron Apps Script:', error);
+                updateStudentDataStatus('Apps Script belum terhubung. Menggunakan data cadangan Google CSV.', 'red');
+                return false;
+            }
+        }
+
+        async function saveSurveyToSheet(payload) {
+            const className = String(payload.kelas || '').trim().toUpperCase();
+            const romanGrade = className.match(/^(?:KELAS\s*)?(XII|XI|X)(?:$|[^A-Z])/ )?.[1];
+            const numericGrade = className.match(/^(?:KELAS\s*)?(10|11|12)(?:$|[^0-9])/ )?.[1];
+            const grade = romanGrade || ({ '10': 'X', '11': 'XI', '12': 'XII' })[numericGrade];
+            const destinations = [
+                ...(grade && CLASS_APPS_SCRIPT_URLS[grade]
+                    ? [{ name: `Sheet kelas ${grade}`, url: CLASS_APPS_SCRIPT_URLS[grade] }]
+                    : []),
+                ...(APPS_SCRIPT_URL ? [{ name: 'Sheet gabungan', url: APPS_SCRIPT_URL }] : [])
+            ];
+            if (destinations.length === 0) return { ok: false, configured: false };
+
+            const results = await Promise.all(destinations.map(async destination => {
+                try {
+                    const response = await fetch(destination.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'submit', ...payload })
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const responseText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (_) {
+                        throw new Error('Apps Script tidak mengembalikan JSON; periksa otorisasi dan akses deployment Web App.');
+                    }
+                    if (data.ok !== true) throw new Error(data.error || 'Respons Apps Script tidak menyatakan berhasil.');
+                    return { name: destination.name, ok: true };
+                } catch (error) {
+                    console.error(`Gagal menyimpan ke ${destination.name}:`, error);
+                    return { name: destination.name, ok: false, error: String(error) };
+                }
+            }));
+
+            return {
+                ok: results.every(result => result.ok),
+                results,
+                error: results.filter(result => !result.ok)
+                    .map(result => `${result.name}: ${result.error}`).join('; ')
+            };
+        }
+
+        async function loadStudentSheets() {
+            studentDataLoading = true;
+            updateStudentDataStatus('Memuat data siswa dari Google Sheet...');
+            if (await loadAppsScriptData()) return;
+            const grades = ['X', 'XI', 'XII'];
+            const combined = [];
+            for (const grade of grades) {
+                try {
+                    const rows = await fetchCSV(SHEETS[grade]);
+                    if (rows.length < 2) continue;
+                    const headers = rows[0].map(h => h.toLowerCase().trim());
+                    const nisnIndex = headers.findIndex(h => h.includes('nisn'));
+                    const nameIndex = headers.findIndex(h => h.includes('nama'));
+                    const classIndex = headers.findIndex(h => h.includes('kelas'));
+                    const genderIndex = headers.findIndex(h => h === 'l/p' || h.includes('jenis kelamin') || h.includes('gender'));
+                    rows.slice(1).forEach(row => {
+                        const nisn = normalizeNISN(row[nisnIndex]);
+                        if (!nisn) return;
+                        combined.push({
+                            nisn,
+                            nama: String(row[nameIndex] || '').trim(),
+                            kelas: String(row[classIndex] || '').trim() || `${grade}`,
+                            jk: String(row[genderIndex] || '').trim().toUpperCase().startsWith('L') ? 'L' : 'P'
+                        });
+                    });
+                } catch (error) {
+                    console.error(`Gagal memuat Sheet kelas ${grade}:`, error);
+                }
+            }
+            studentDatabase = combined.length > 0 ? combined : [DEMO_STUDENT];
+            studentDataLoading = false;
+            if (!studentDatabase.some(student => student.nisn === DEMO_STUDENT.nisn)) {
+                studentDatabase.push(DEMO_STUDENT);
+            }
+            if (combined.length > 0) {
+                updateStudentDataStatus(`Data siap: ${combined.length} siswa dari Sheet X, XI, dan XII. Hasil survei belum dikirim ke Sheet karena Apps Script belum dikonfigurasi.`, 'amber');
+            } else {
+                updateStudentDataStatus('Gagal memuat Sheet. Jalankan aplikasi melalui alamat http, bukan dengan membuka file HTML langsung.', 'red');
+            }
+
+            try {
+                const saved = JSON.parse(localStorage.getItem('kaihSurveySubmissions') || '[]');
+                if (Array.isArray(saved)) {
+                    surveySubmissions = saved.map(submission => ({ ...submission, nisn: normalizeNISN(submission.nisn) }));
+                }
+            } catch (_) {}
+
+            await loadRekapSheet();
+            if (currentUser?.role === 'wali') renderWaliDashboard();
+        }
+
+        async function loadRekapSheet() {
+            try {
+                const rows = await fetchCSV(SHEETS.REKAP);
+                if (rows.length < 2) return;
+                const headers = rows[0].map(h => h.toLowerCase().trim());
+                const nisnIndex = headers.findIndex(h => h.includes('nisn'));
+                if (nisnIndex < 0) return;
+                const scoreIndex = headers.findIndex(h => h.includes('poin') || h.includes('skor') || h.includes('nilai') || h.includes('total'));
+                const dateIndex = headers.findIndex(h => h.includes('tanggal') || h.includes('date'));
+                rows.slice(1).forEach(row => {
+                    const nisn = normalizeNISN(row[nisnIndex]);
+                    if (!nisn) return;
+                    const totalPoin = scoreIndex >= 0 ? Number(String(row[scoreIndex]).replace(/[^0-9]/g, '')) || 0 : 0;
+                    const tanggal = dateIndex >= 0 ? String(row[dateIndex] || '').trim() : '';
+                    const existing = surveySubmissions.findIndex(s => s.nisn === nisn);
+                    const submission = { nisn, totalPoin, tanggal };
+                    if (existing >= 0) surveySubmissions[existing] = submission;
+                    else surveySubmissions.push(submission);
+                });
+                localStorage.setItem('kaihSurveySubmissions', JSON.stringify(surveySubmissions));
+            } catch (error) {
+                console.warn('Sheet rekap belum dapat dibaca atau belum memiliki data:', error);
+            }
+        }
+
+        // Akun Wali Kelas
+        const WALI_KELAS_ID = "1234567890";
+
+        let currentUser = null;
+
+        // Switch Login Tab
+        function switchLoginTab(mode) {
+            currentLoginMode = mode;
+            const tabSiswa = document.getElementById('tabSiswaBtn');
+            const tabWali = document.getElementById('tabWaliBtn');
+            const title = document.getElementById('loginTitle');
+            const desc = document.getElementById('loginDesc');
+            const label = document.getElementById('inputLabel');
+            const icon = document.getElementById('inputIcon');
+            const input = document.getElementById('nisnInput');
+            const demoHint = document.getElementById('demoHint');
+            const loginIcon = document.getElementById('loginIcon');
+            const infoBoxText = document.getElementById('infoBoxText');
+            const errorElement = document.getElementById('loginError');
+
+            errorElement.classList.add('hidden');
+            input.value = '';
+
+            if (mode === 'siswa') {
+                tabSiswa.className = "flex-1 py-2 rounded-xl bg-white text-indigo-600 shadow-sm transition font-bold";
+                tabWali.className = "flex-1 py-2 rounded-xl text-slate-500 hover:text-indigo-600 transition font-normal";
+                loginIcon.className = "fa-solid fa-id-card";
+                title.innerText = "Login Siswa";
+                desc.innerText = "Masukkan Nomor Induk Siswa Nasional (NISN) Anda.";
+                label.innerText = "NISN SISWA";
+                icon.className = "fa-solid fa-hashtag";
+                input.placeholder = "Contoh: 0123456789";
+                demoHint.innerHTML = "NISN Demo Siswa: <b>0123456789</b>";
+                infoBoxText.innerText = "Sistem mencocokkan NISN siswa secara real-time dengan Data Master Siswa.";
+            } else {
+                tabWali.className = "flex-1 py-2 rounded-xl bg-white text-indigo-600 shadow-sm transition font-bold";
+                tabSiswa.className = "flex-1 py-2 rounded-xl text-slate-500 hover:text-indigo-600 transition font-normal";
+                loginIcon.className = "fa-solid fa-user-tie";
+                title.innerText = "Login Wali Kelas";
+                desc.innerText = "Masukkan Kode ID/NIP Wali Kelas untuk membuka dashboard pemantauan.";
+                label.innerText = "ID / NIP WALI KELAS";
+                icon.className = "fa-solid fa-key";
+                input.placeholder = "Masukkan Kode ID Wali Kelas";
+                demoHint.innerHTML = ""; // ID Wali Kelas disembunyikan
+                infoBoxText.innerText = "Wali Kelas dapat memantau presensi dan daftar siswa yang belum mengisi survei.";
+            }
+        }
+
+        // Set Default Date to Today
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('surveyDate');
+            if (dateInput) dateInput.value = today;
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            setDefaultDate();
+            loadStudentSheets();
+            window.setInterval(() => {
+                if (APPS_SCRIPT_URL) loadAppsScriptData();
+            }, 30000);
+        });
+
+        // Function Login
+        function handleLogin(event) {
+            event.preventDefault();
+            const inputVal = document.getElementById('nisnInput').value.trim();
+            const errorElement = document.getElementById('loginError');
+            const errorMessageText = document.getElementById('errorMessageText');
+
+            if (currentLoginMode === 'wali') {
+                if (inputVal === WALI_KELAS_ID) {
+                    currentUser = { nama: "Wali Kelas", role: 'wali' };
+                    errorElement.classList.add('hidden');
+                    document.getElementById('userNameDisplay').innerText = "Wali Kelas";
+                    document.getElementById('userGenderBadge').classList.add('hidden');
+                    document.getElementById('userInfoHeader').classList.remove('hidden');
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('waliSection').classList.remove('hidden');
+                    renderWaliDashboard();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    errorMessageText.innerText = "ID / NIP Wali Kelas tidak valid! Silakan periksa kembali.";
+                    errorElement.classList.remove('hidden');
+                }
+                return;
+            }
+
+            const normalizedNISN = normalizeNISN(inputVal);
+            const foundStudent = studentDatabase.find(student => normalizeNISN(student.nisn) === normalizedNISN);
+            if (foundStudent) {
+                currentUser = { ...foundStudent, role: 'siswa' };
+                errorElement.classList.add('hidden');
+                setDefaultDate();
+                document.getElementById('userNameDisplay').innerText = `${currentUser.nama} (${currentUser.kelas})`;
+                document.getElementById('userGenderBadge').innerText = currentUser.jk;
+                document.getElementById('userGenderBadge').classList.remove('hidden');
+                document.getElementById('userInfoHeader').classList.remove('hidden');
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('surveySection').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                if (studentDataLoading) {
+                    errorMessageText.innerText = "Data siswa sedang dimuat. Tunggu beberapa detik, lalu coba lagi.";
+                } else {
+                    errorMessageText.innerText = "NISN tidak ditemukan pada data Sheet kelas X, XI, atau XII. Pastikan NISN ditulis lengkap (tanpa spasi).";
+                }
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('userInfoHeader').classList.add('hidden');
+            document.getElementById('surveySection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('waliSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+        }
+
+        // ================= WALI KELAS DASHBOARD LOGIC =================
+        function updateWaliClassOptions() {
+            const select = document.getElementById('filterKelas');
+            if (!select) return;
+
+            const selectedValue = select.value || 'ALL';
+            const classes = [...new Set(studentDatabase
+                .map(student => String(student.kelas || '').trim())
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'id', { numeric: true, sensitivity: 'base' }));
+
+            select.replaceChildren(
+                new Option('Semua Kelas', 'ALL'),
+                new Option('Tingkat X', 'X'),
+                new Option('Tingkat XI', 'XI'),
+                new Option('Tingkat XII', 'XII'),
+                ...classes.map(className => new Option(className, `CLASS:${className}`))
+            );
+            select.value = [...select.options].some(option => option.value === selectedValue)
+                ? selectedValue
+                : 'ALL';
+        }
+
+        function matchesWaliClassFilter(student, filter) {
+            const className = String(student.kelas || '').trim();
+            if (filter === 'ALL') return true;
+            if (filter.startsWith('CLASS:')) {
+                return className.toLocaleLowerCase() === filter.slice(6).toLocaleLowerCase();
+            }
+            const gradeMatch = className.toUpperCase()
+                .match(/^(?:KELAS\s*)?(XII|XI|X|10|11|12)(?:$|[^A-Z0-9])/);
+            const grade = gradeMatch?.[1];
+            const romanGrade = ({ '10': 'X', '11': 'XI', '12': 'XII' })[grade] || grade;
+            return String(romanGrade || '') === filter;
+        }
+
+        function normalizeSurveyDate(value) {
+            const dateText = String(value || '').trim();
+            const isoDate = dateText.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (isoDate) {
+                return `${isoDate[1]}-${isoDate[2].padStart(2, '0')}-${isoDate[3].padStart(2, '0')}`;
+            }
+
+            const localDate = dateText.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+            if (localDate) {
+                return `${localDate[3]}-${localDate[2].padStart(2, '0')}-${localDate[1].padStart(2, '0')}`;
+            }
+
+            return '';
+        }
+
+        function getWaliDateRange() {
+            const start = document.getElementById('filterTanggalMulai').value;
+            const end = document.getElementById('filterTanggalAkhir').value;
+            const error = document.getElementById('filterTanggalError');
+            if (start && end && start > end) {
+                error.textContent = 'Tanggal mulai tidak boleh melewati tanggal akhir.';
+                error.classList.remove('hidden');
+                return null;
+            }
+            error.textContent = '';
+            error.classList.add('hidden');
+            return { start, end };
+        }
+
+        function submissionInWaliDateRange(submission, range) {
+            const date = normalizeSurveyDate(submission.tanggal);
+            if (!date) return !range.start && !range.end;
+            return (!range.start || date >= range.start) && (!range.end || date <= range.end);
+        }
+
+        function clearWaliDateFilter() {
+            document.getElementById('filterTanggalMulai').value = '';
+            document.getElementById('filterTanggalAkhir').value = '';
+            renderWaliDashboard();
+        }
+
+        function renderWaliDashboard() {
+            const dateRange = getWaliDateRange();
+            if (!dateRange) return;
+            updateWaliClassOptions();
+            const filterKelas = document.getElementById('filterKelas')?.value || 'ALL';
+            const scopedStudents = studentDatabase.filter(student => matchesWaliClassFilter(student, filterKelas));
+            const scopedNisn = scopedStudents.map(s => s.nisn);
+            const scopedSubmissions = surveySubmissions.filter(s =>
+                scopedNisn.includes(s.nisn) && submissionInWaliDateRange(s, dateRange)
+            );
+            const totalSiswa = scopedStudents.length;
+            const countSudah = scopedStudents.filter(s => scopedSubmissions.some(sub => sub.nisn === s.nisn)).length;
+            const countBelum = totalSiswa - countSudah;
+
+            const sudahPct = totalSiswa > 0 ? Math.round((countSudah / totalSiswa) * 100) : 0;
+            const belumPct = totalSiswa > 0 ? Math.round((countBelum / totalSiswa) * 100) : 0;
+
+            const totalScoreSum = scopedSubmissions.reduce((sum, sub) => sum + Number(sub.totalPoin || 0), 0);
+            const avgScore = scopedSubmissions.length > 0 ? Math.round(totalScoreSum / scopedSubmissions.length) : 0;
+
+            document.getElementById('statTotal').innerText = totalSiswa;
+            document.getElementById('statSudah').innerText = countSudah;
+            document.getElementById('statSudahPct').innerText = `${sudahPct}% Partisipasi`;
+            document.getElementById('statBelum').innerText = countBelum;
+            document.getElementById('statBelumPct').innerText = `${belumPct}% Belum Respon`;
+            document.getElementById('statAvgScore').innerText = avgScore;
+
+            renderWaliTable();
+        }
+
+        async function refreshWaliData() {
+            await loadStudentSheets();
+            await loadRekapSheet();
+            renderWaliDashboard();
+        }
+
+        function renderWaliTable() {
+            const dateRange = getWaliDateRange();
+            if (!dateRange) return;
+            const tbody = document.getElementById('waliTableBody');
+            const filterKelas = document.getElementById('filterKelas').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            const searchQuery = document.getElementById('searchSiswa').value.toLowerCase().trim();
+            const filteredSubmissions = surveySubmissions.filter(submission =>
+                submissionInWaliDateRange(submission, dateRange)
+            );
+
+            tbody.innerHTML = '';
+
+            let filteredList = studentDatabase.filter(siswa => {
+                // Filter Kelas
+                if (!matchesWaliClassFilter(siswa, filterKelas)) return false;
+
+                // Submissions lookup
+                const submission = filteredSubmissions.find(sub => sub.nisn === siswa.nisn);
+                const isSudah = !!submission;
+
+                // Filter Status
+                if (filterStatus === 'SUDAH' && !isSudah) return false;
+                if (filterStatus === 'BELUM' && isSudah) return false;
+
+                // Search Query
+                if (searchQuery !== '') {
+                    const matchName = siswa.nama.toLowerCase().includes(searchQuery);
+                    const matchNisn = siswa.nisn.includes(searchQuery);
+                    if (!matchName && !matchNisn) return false;
+                }
+
+                return true;
+            });
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-6 text-center text-slate-400 italic">
+                            Tidak ditemukan siswa dengan kriteria filter yang dipilih.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredList.forEach((siswa, index) => {
+                const submission = filteredSubmissions.find(sub => sub.nisn === siswa.nisn);
+                const isSudah = !!submission;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-500">${index + 1}</td>
+                    <td class="p-3 font-mono font-semibold text-slate-700">${siswa.nisn}</td>
+                    <td class="p-3 font-bold text-slate-800">${siswa.nama}</td>
+                    <td class="p-3 text-slate-600">${siswa.kelas}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${siswa.jk === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">
+                            ${siswa.jk}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        ${isSudah 
+                            ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-[11px] font-bold"><i class="fa-solid fa-circle-check"></i> Sudah</span>`
+                            : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-[11px] font-bold"><i class="fa-solid fa-clock"></i> Belum</span>`
+                        }
+                    </td>
+                    <td class="p-3 text-center text-slate-600">
+                        ${isSudah 
+                            ? `<span class="font-bold text-indigo-600">${submission.totalPoin} Poin</span> <br><span class="text-[10px] text-slate-400">${submission.tanggal}</span>`
+                            : `<span class="text-slate-300">-</span>`
+                        }
+                    </td>
+                    <td class="p-3 text-center">
+                        ${!isSudah 
+                            ? `<button onclick="copyReminderIndividual('${siswa.nama}', '${siswa.nisn}')" title="Pengingat Siswa" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-semibold rounded-lg transition shadow-sm">
+                                <i class="fa-solid fa-bell"></i> Ingatkan
+                               </button>`
+                            : `<span class="text-emerald-500 font-bold text-[11px]"><i class="fa-solid fa-check"></i> Selesai</span>`
+                        }
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Pengingat Massal WhatsApp
+        function copyReminderText() {
+            const dateRange = getWaliDateRange();
+            if (!dateRange) return;
+            const filterKelas = document.getElementById('filterKelas')?.value || 'ALL';
+            const belumList = studentDatabase.filter(s =>
+                matchesWaliClassFilter(s, filterKelas) &&
+                !surveySubmissions.some(sub =>
+                    sub.nisn === s.nisn && submissionInWaliDateRange(sub, dateRange)
+                )
+            );
+            if (belumList.length === 0) {
+                alert("Semua siswa sudah mengisi survei! Terima kasih.");
+                return;
+            }
+
+            let text = "*PENGUMUMAN SURVEI 7 KEBIASAAN ANAK INDONESIA HEBAT*\n\n";
+            text += "Diberitahukan kepada siswa/i yang belum mengisi survei harian, mohon untuk segera mengisi formulir survei melalui Google Sites.\n\n";
+            text += "*Daftar Siswa Belum Mengisi:*\n";
+            belumList.forEach((s, idx) => {
+                text += `${idx + 1}. ${s.nama} (${s.kelas})\n`;
+            });
+            text += "\nTerima kasih atas perhatiannya!";
+
+            copyToClipboard(text, "Pesan pengingat grup WhatsApp berhasil disalin!");
+        }
+
+        // Pengingat Individu
+        function copyReminderIndividual(nama, nisn) {
+            const text = `Halo ${nama}, mohon segera mengisi Survei 7 Kebiasaan Anak Indonesia Hebat hari ini di Google Sites sekolah ya. Gunakan NISN kamu: ${nisn}. Terima kasih!`;
+            copyToClipboard(text, `Pesan pengingat untuk ${nama} berhasil disalin!`);
+        }
+
+        // Helper Clipboard Safe
+        function copyToClipboard(text, successMsg) {
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert(successMsg);
+        }
+
+        // Live Calculate for Checkbox (Makan Sehat)
+        function updateMakanScore() {
+            const checkboxes = document.querySelectorAll('.makan-cb');
+            let total = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += parseInt(cb.value);
+                }
+            });
+            if (total > 15) total = 15;
+            
+            const displayElem = document.getElementById('makanScoreDisplay');
+            if (displayElem) {
+                displayElem.innerText = total;
+            }
+            return total;
+        }
+
+        // Calculate All Results
+        async function calculateResults(event) {
+            event.preventDefault();
+            if (surveySubmissionInProgress) return;
+
+            if (!currentUser || currentUser.role !== 'siswa') {
+                alert("Silakan login sebagai siswa terlebih dahulu.");
+                return;
+            }
+            surveySubmissionInProgress = true;
+            const submitButton = document.getElementById('submitSurveyButton');
+            const submitButtonText = document.getElementById('submitSurveyButtonText');
+            submitButton.disabled = true;
+            submitButtonText.textContent = 'Mengirim survei...';
+
+            // Extract Date
+            const surveyDateValue = document.getElementById('surveyDate').value;
+            const formattedDate = surveyDateValue ? new Date(surveyDateValue).toLocaleDateString('id-ID', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            }) : '-';
+
+            // Extract Values from Form
+            const bangunScore = parseInt(document.querySelector('input[name="bangun"]:checked')?.value || 0);
+            const ibadahScore = parseInt(document.querySelector('input[name="ibadah"]:checked')?.value || 0);
+            const olahragaScore = parseInt(document.querySelector('input[name="olahraga"]:checked')?.value || 0);
+            const makanScore = updateMakanScore();
+            const belajarScore = parseInt(document.querySelector('input[name="belajar"]:checked')?.value || 0);
+            const sosialScore = parseInt(document.querySelector('input[name="sosial"]:checked')?.value || 0);
+            const tidurScore = parseInt(document.querySelector('input[name="tidur"]:checked')?.value || 0);
+
+            // Grand Total (Maksimal 105 Poin)
+            const grandTotal = bangunScore + ibadahScore + olahragaScore + makanScore + belajarScore + sosialScore + tidurScore;
+
+            // Catat pengisian ke dalam riwayat lokal
+            const existingIndex = surveySubmissions.findIndex(sub => sub.nisn === currentUser.nisn);
+            if (existingIndex !== -1) {
+                surveySubmissions[existingIndex] = { nisn: currentUser.nisn, totalPoin: grandTotal, tanggal: surveyDateValue };
+            } else {
+                surveySubmissions.push({ nisn: currentUser.nisn, totalPoin: grandTotal, tanggal: surveyDateValue });
+            }
+            localStorage.setItem('kaihSurveySubmissions', JSON.stringify(surveySubmissions));
+
+            const sheetResult = await saveSurveyToSheet({
+                nisn: currentUser.nisn,
+                nama: currentUser.nama,
+                kelas: currentUser.kelas,
+                jk: currentUser.jk,
+                tanggal: surveyDateValue,
+                bangunScore,
+                ibadahScore,
+                olahragaScore,
+                makanScore,
+                belajarScore,
+                sosialScore,
+                tidurScore,
+                totalPoin: grandTotal
+            });
+            surveySubmissionInProgress = false;
+            submitButton.disabled = false;
+            submitButtonText.textContent = 'Kirim & Lihat Hasil Rekapitulasi';
+
+            if (sheetResult.results) {
+                const saved = sheetResult.results.filter(result => result.ok).map(result => result.name);
+                const failed = sheetResult.results.filter(result => !result.ok);
+                const status = document.getElementById('surveySubmitStatus');
+                if (failed.length === 0) {
+                    status.className = 'rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-left text-sm font-semibold text-emerald-800';
+                    status.textContent = `Hasil survei berhasil disimpan ke ${saved.join(' dan ')}.`;
+                } else if (saved.length > 0) {
+                    status.className = 'rounded-xl border border-rose-200 bg-rose-50 p-4 text-left text-sm font-semibold text-rose-800';
+                    status.textContent = `Hasil tersimpan ke ${saved.join(' dan ')}, tetapi gagal ke ${failed.map(result => result.name).join(' dan ')}. ${failed.map(result => result.error).join('; ')}`;
+                } else {
+                    status.className = 'rounded-xl border border-rose-200 bg-rose-50 p-4 text-left text-sm font-semibold text-rose-800';
+                    status.textContent = `Hasil survei belum berhasil dikirim ke ${failed.map(result => result.name).join(' dan ')}. ${failed.map(result => result.error).join('; ')}`;
+                }
+                status.classList.remove('hidden');
+                if (!sheetResult.ok) console.error(sheetResult.error);
+            } else {
+                const status = document.getElementById('surveySubmitStatus');
+                status.className = 'rounded-xl border border-amber-200 bg-amber-50 p-4 text-left text-sm font-semibold text-amber-800';
+                status.textContent = 'Hasil survei tersimpan di perangkat ini saja; belum dikirim ke Google Sheet.';
+                status.classList.remove('hidden');
+            }
+
+            // Display Breakdowns
+            document.getElementById('score_bangun').innerText = `${bangunScore} Poin`;
+            document.getElementById('score_ibadah').innerText = `${ibadahScore} Poin`;
+            document.getElementById('score_olahraga').innerText = `${olahragaScore} Poin`;
+            document.getElementById('score_makan').innerText = `${makanScore} Poin`;
+            document.getElementById('score_belajar').innerText = `${belajarScore} Poin`;
+            document.getElementById('score_sosial').innerText = `${sosialScore} Poin`;
+            document.getElementById('score_tidur').innerText = `${tidurScore} Poin`;
+
+            // Display Total Score & Student Info
+            document.getElementById('totalScore').innerText = grandTotal;
+            document.getElementById('resultStudentName').innerText = currentUser.nama;
+            document.getElementById('resultStudentDetail').innerText = `NISN: ${currentUser.nisn} | Kelas: ${currentUser.kelas} | Jenis Kelamin: ${currentUser.jk === 'L' ? 'Laki-laki' : 'Perempuan'}`;
+            document.getElementById('resultSurveyDate').innerText = `Tanggal Survei: ${formattedDate}`;
+
+            // Category & Recommendation Badge
+            const badge = document.getElementById('badgeCategory');
+            const adviceText = document.getElementById('adviceText');
+
+            if (grandTotal >= 95) {
+                badge.innerText = "Sangat Luar Biasa (Bintang 5)";
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold text-white bg-emerald-600 mt-1 shadow";
+                adviceText.innerText = "Luar biasa! Kamu sudah menerapkan 7 kebiasaan Anak Indonesia Hebat secara konsisten. Pertahankan disiplin dan jadilah teladan bagi teman-temanmu!";
+            } else if (grandTotal >= 75) {
+                badge.innerText = "Hebat & Baik (Bintang 4)";
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold text-white bg-sky-600 mt-1 shadow";
+                adviceText.innerText = "Kerja bagus! Kebiasaan harianmu sudah sangat baik. Asah sedikit lagi poin yang masih kurang agar makin sempurna!";
+            } else if (grandTotal >= 55) {
+                badge.innerText = "Cukup Baik (Bintang 3)";
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold text-white bg-amber-500 mt-1 shadow";
+                adviceText.innerText = "Sudah baik, namun masih ada beberapa kebiasaan seperti waktu tidur atau belajar yang perlu ditingkatkan lagi. Semangat!";
+            } else {
+                badge.innerText = "Perlu Perhatian (Bintang 2)";
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold text-white bg-rose-500 mt-1 shadow";
+                adviceText.innerText = "Jangan berkecil hati! Mulai besok, yuk bangun lebih awal, tidur tepat waktu, dan sempatkan belajar mandiri ya!";
+            }
+
+            // Switch to Result View
+            document.getElementById('surveySection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Reset & Survey Again
+        function resetForm() {
+            document.getElementById('surveyForm').reset();
+            surveySubmissionInProgress = false;
+            document.getElementById('submitSurveyButton').disabled = false;
+            document.getElementById('submitSurveyButtonText').textContent = 'Kirim & Lihat Hasil Rekapitulasi';
+            setDefaultDate();
+            const displayElem = document.getElementById('makanScoreDisplay');
+            if (displayElem) {
+                displayElem.innerText = "0";
+            }
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('surveySection').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
